@@ -1,6 +1,6 @@
 /**
  * Crash Stats
- * Copyright (C) 2023 Poggu
+ * Copyright (C) 2023 Source2ZE
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +43,7 @@ public: //hooks
 				 bool background );
 	void OnLevelShutdown();
 	void Hook_GameFrame( bool simulating, bool bFirstTick, bool bLastTick );
-	void Hook_ClientActive( CPlayerSlot slot, bool bLoadGame, const char *pszName, uint64 xuid );
 	void Hook_ClientDisconnect( CPlayerSlot slot, int reason, const char *pszName, uint64 xuid, const char *pszNetworkID );
-	void Hook_ClientPutInServer( CPlayerSlot slot, char const *pszName, int type, uint64 xuid );
-	void Hook_ClientSettingsChanged( CPlayerSlot slot );
-	void Hook_OnClientConnected( CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, const char *pszAddress, bool bFakePlayer );
-	bool Hook_ClientConnect( CPlayerSlot slot, const char *pszName, uint64 xuid, const char *pszNetworkID, bool unk1, CBufferString *pRejectReason );
-	void Hook_ClientCommand( CPlayerSlot nSlot, const CCommand &_cmd );
 public:
 	const char *GetAuthor();
 	const char *GetName();
