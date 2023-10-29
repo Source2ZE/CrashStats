@@ -235,14 +235,13 @@ class MMSPluginConfig(object):
       ]
 
       if cxx.version == 'apple-clang-6.0' or cxx.version == 'clang-3.4':
-        cxx.cxxflags += ['-std=c++20']
+        cxx.cxxflags += ['-std=c++2a']
       else:
-        cxx.cxxflags += ['-std=c++20']
+        cxx.cxxflags += ['-std=c++2a']
       if (cxx.version >= 'gcc-4.0') or cxx.family == 'clang':
         cxx.cflags += ['-fvisibility=hidden']
         cxx.cxxflags += ['-fvisibility-inlines-hidden']
       cxx.cxxflags += [
-        '-fno-exceptions',
         '-fno-rtti',
         '-fno-threadsafe-statics',
         '-Wno-non-virtual-dtor',

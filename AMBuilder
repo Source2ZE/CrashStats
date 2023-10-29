@@ -14,7 +14,7 @@ for sdk_name in MMSPlugin.sdks:
       continue
 
     binary = MMSPlugin.HL2Library(builder, cxx, MMSPlugin.plugin_name, sdk)
-    binary.compiler.cxxflags += ["-DMSGPACK_NO_BOOST"]
+    binary.compiler.cxxflags += ["-DMSGPACK_NO_BOOST", "-Wno-return-type"]
 
     if binary.compiler.target.platform == 'windows':
       binary.compiler.postlink += [
