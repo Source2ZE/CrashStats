@@ -1,4 +1,4 @@
-# vim: set ts=2 sw=2 tw=99 noet ft=python: 
+# vim: set ts=2 sw=2 tw=99 noet ft=python:
 import os
 
 builder.SetBuildFolder('package')

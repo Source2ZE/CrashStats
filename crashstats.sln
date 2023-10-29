@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crashstats", "crashstats.vcxproj", "{D147498C-768E-11EE-9468-005056C00002}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|x64 = Default|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D147498C-768E-11EE-9468-005056C00002}.Default|x64.ActiveCfg = Default|x64
+		{D147498C-768E-11EE-9468-005056C00002}.Default|x64.Build.0 = Default|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {307FF659-C220-4D27-9F56-46A8ABFB8E0C}
+	EndGlobalSection
+EndGlobal

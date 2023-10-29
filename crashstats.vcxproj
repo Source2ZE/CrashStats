@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Default|x64">
+      <Configuration>Default</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D147498C-768E-11EE-9468-005056C00002}</ProjectGuid>
+    <RootNamespace>crashstats</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Default|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Default|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Default|x64'">build\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Default|x64'">build\$(ProjectName)\int</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Default|x64'">true</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Default|x64'">crashstats</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Default|x64'">
+    <ClCompile>
+      <AdditionalOptions>/DSE_EPISODEONE=1 /DSE_ORANGEBOX=3 /DSE_CSS=6 /DSE_HL2DM=7 /DSE_DODS=8 /DSE_SDK2013=9 /DSE_TF2=12 /DSE_LEFT4DEAD=13 /DSE_NUCLEARDAWN=14 /DSE_LEFT4DEAD2=16 /DSE_DARKMESSIAH=2 /DSE_ALIENSWARM=17 /DSE_BLOODYGOODTIME=4 /DSE_EYE=5 /DSE_MCV=22 /DSE_CSGO=23 /DSE_PORTAL2=18 /DSE_BLADE=19 /DSE_INSURGENCY=20 /DSE_DOI=21 /DSE_CONTAGION=15 /DSE_BMS=11 /DSE_MOCK=999 /DSE_PVKII=10 /DSE_DOTA=24 /DSE_CS2=25 /DSOURCE_ENGINE=25 /Zi /TP</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MMSOURCE112)\core;$(MMSOURCE112)\core\sourcehook;sdk\public;sdk\public\engine;sdk\public\mathlib;sdk\public\vstdlib;sdk\public\tier0;sdk\public\tier1;sdk\public\game\server;sdk\game\shared;sdk\common;vendor\msgpack\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC64;X64BITS;PLATFORM_64BITS;META_IS_SOURCE2;MSGPACK_NO_BOOST</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <OmitFramePointer>true</OmitFramePointer>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;SE_EPISODEONE=1;SE_ORANGEBOX=3;SE_CSS=6;SE_HL2DM=7;SE_DODS=8;SE_SDK2013=9;SE_TF2=12;SE_LEFT4DEAD=13;SE_NUCLEARDAWN=14;SE_LEFT4DEAD2=16;SE_DARKMESSIAH=2;SE_ALIENSWARM=17;SE_BLOODYGOODTIME=4;SE_EYE=5;SE_MCV=22;SE_CSGO=23;SE_PORTAL2=18;SE_BLADE=19;SE_INSURGENCY=20;SE_DOI=21;SE_CONTAGION=15;SE_BMS=11;SE_MOCK=999;SE_PVKII=10;SE_DOTA=24;SE_CS2=25;SOURCE_ENGINE=25;COMPILER_MSVC;COMPILER_MSVC64;X64BITS;PLATFORM_64BITS;META_IS_SOURCE2</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>G:\FunPlay\alliemodders-s2\metamod-source\core;G:\FunPlay\alliemodders-s2\metamod-source\core\sourcehook;G:\FunPlay\Source2\crash-stats;G:\CS2Fixes\sdk\public;G:\CS2Fixes\sdk\public\engine;G:\CS2Fixes\sdk\public\mathlib;G:\CS2Fixes\sdk\public\vstdlib;G:\CS2Fixes\sdk\public\tier0;G:\CS2Fixes\sdk\public\tier1;G:\CS2Fixes\sdk\public\game\server;G:\CS2Fixes\sdk\game\shared;G:\CS2Fixes\sdk\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies);kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;legacy_stdio_definitions.lib;sdk\lib\public\win64\tier0.lib;sdk\lib\public\win64\tier1.lib;sdk\lib\public\win64\mathlib.lib;sdk\lib\public\win64\interfaces.lib;sdk\lib\public\win64\steam_api64.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="G:\FunPlay\Source2\crash-stats\crashstats.cpp" />
+    <ClCompile Include="G:\CS2Fixes\sdk\tier1\convar.cpp" />
+    <ClCompile Include="G:\CS2Fixes\sdk\public\tier0\memoverride.cpp" />
+    <ClCompile Include="httpmanager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="crashstats.h" />
+    <ClInclude Include="httpmanager.h" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

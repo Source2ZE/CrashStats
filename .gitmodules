@@ -1,0 +1,6 @@
+[submodule "sdk"]
+	path = sdk
+	url = https://github.com/alliedmodders/hl2sdk/
+[submodule "vendor/msgpack"]
+	path = vendor/msgpack
+	url = https://github.com/msgpack/msgpack-c

@@ -17,8 +17,14 @@
  */
 
 #include <stdio.h>
+#include <vector>
 #include "crashstats.h"
 #include "iserver.h"
+#include "httpmanager.h"
+#include <msgpack.hpp>
+
+#define NETWORK_DISCONNECT_TIMEDOUT 29
+#define API_URL	"IMPLEMENT"
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK4_void(IServerGameClients, ClientActive, SH_NOATTRIB, 0, CPlayerSlot, bool, const char *, uint64);
@@ -28,6 +34,8 @@ SH_DECL_HOOK1_void(IServerGameClients, ClientSettingsChanged, SH_NOATTRIB, 0, CP
 SH_DECL_HOOK6_void(IServerGameClients, OnClientConnected, SH_NOATTRIB, 0, CPlayerSlot, const char*, uint64, const char *, const char *, bool);
 SH_DECL_HOOK6(IServerGameClients, ClientConnect, SH_NOATTRIB, 0, bool, CPlayerSlot, const char*, uint64, const char *, bool, CBufferString *);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool);
+SH_DECL_HOOK0_void(IServerGameDLL, GameServerSteamAPIActivated, SH_NOATTRIB, 0);
+SH_DECL_HOOK0_void(IServerGameDLL, GameServerSteamAPIDeactivated, SH_NOATTRIB, 0);
 
 SH_DECL_HOOK2_void( IServerGameClients, ClientCommand, SH_NOATTRIB, 0, CPlayerSlot, const CCommand & );
 
@@ -35,8 +43,11 @@ CrashStats g_CrashStats;
 IServerGameDLL *server = NULL;
 IServerGameClients *gameclients = NULL;
 IVEngineServer *engine = NULL;
-IGameEventManager2 *gameevents = NULL;
 ICvar *icvar = NULL;
+ISteamHTTP* g_http = nullptr;
+CSteamGameServerAPIContext g_steamAPI;
+
+std::vector<std::tuple<std::string, uint64>> g_vecCrashes;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -50,6 +61,25 @@ CGlobalVars *GetGameGlobals()
 	return g_pNetworkServerService->GetIGameServer()->GetGlobals();
 }
 
+void SendCrashReport()
+{
+	if (!g_vecCrashes.size())
+		return;
+
+	for (auto xuid : g_vecCrashes)
+	{
+		ConMsg("Reporting %lli crash\n", xuid);
+	}
+
+	msgpack::sbuffer sbuf;
+	msgpack::pack(sbuf, g_vecCrashes);
+
+	g_HTTPManager.POSTRAW(API_URL, "application/msgpack", (uint8*)sbuf.data(), sbuf.size(), [](HTTPRequestHandle, char*) {
+	});
+
+	g_vecCrashes.clear();
+}
+
 PLUGIN_EXPOSE(CrashStats, g_CrashStats);
 bool CrashStats::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late)
 {
@@ -60,6 +90,7 @@ bool CrashStats::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bo
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
 	GET_V_IFACE_ANY(GetServerFactory, gameclients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
 	GET_V_IFACE_ANY(GetEngineFactory, g_pNetworkServerService, INetworkServerService, NETWORKSERVERSERVICE_INTERFACE_VERSION);
+	GET_V_IFACE_ANY(GetServerFactory, g_pSource2Server, ISource2Server, SOURCE2SERVER_INTERFACE_VERSION);
 
 	// Currently doesn't work from within mm side, use GetGameGlobals() in the mean time instead
 	// gpGlobals = ismm->GetCGlobals();
@@ -74,13 +105,28 @@ bool CrashStats::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bo
 	SH_ADD_HOOK_MEMFUNC(IServerGameClients, OnClientConnected, gameclients, this, &CrashStats::Hook_OnClientConnected, false);
 	SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientConnect, gameclients, this, &CrashStats::Hook_ClientConnect, false);
 	SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &CrashStats::Hook_ClientCommand, false);
-
-	META_CONPRINTF( "All hooks started!\n" );
+	SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameServerSteamAPIActivated, g_pSource2Server, this, &CrashStats::Hook_GameServerSteamAPIActivated, false);
+	SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameServerSteamAPIDeactivated, g_pSource2Server, this, &CrashStats::Hook_GameServerSteamAPIDeactivated, false);
 
 	g_pCVar = icvar;
 	ConVar_Register( FCVAR_RELEASE | FCVAR_CLIENT_CAN_EXECUTE | FCVAR_GAMEDLL );
 
 	return true;
+}
+
+void CrashStats::Hook_GameServerSteamAPIActivated()
+{
+	g_steamAPI.Init();
+	g_http = g_steamAPI.SteamHTTP();
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void CrashStats::Hook_GameServerSteamAPIDeactivated()
+{
+	g_http = nullptr;
+
+	RETURN_META(MRES_IGNORED);
 }
 
 bool CrashStats::Unload(char *error, size_t maxlen)
@@ -94,6 +140,7 @@ bool CrashStats::Unload(char *error, size_t maxlen)
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientConnect, gameclients, this, &CrashStats::Hook_ClientConnect, false);
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &CrashStats::Hook_ClientCommand, false);
 
+	g_vecCrashes.clear();
 	return true;
 }
 
@@ -136,16 +183,25 @@ void CrashStats::Hook_ClientPutInServer( CPlayerSlot slot, char const *pszName, 
 void CrashStats::Hook_ClientDisconnect( CPlayerSlot slot, int reason, const char *pszName, uint64 xuid, const char *pszNetworkID )
 {
 	META_CONPRINTF( "Hook_ClientDisconnect(%d, %d, \"%s\", %d, \"%s\")\n", slot, reason, pszName, xuid, pszNetworkID );
+
+	if (reason == NETWORK_DISCONNECT_TIMEDOUT)
+	{
+		META_CONPRINTF("Crash detected");
+		g_vecCrashes.push_back(std::tuple<std::string, uint64>(std::string(pszName), xuid));
+	}
 }
 
 void CrashStats::Hook_GameFrame( bool simulating, bool bFirstTick, bool bLastTick )
 {
-	/**
-	 * simulating:
-	 * ***********
-	 * true  | game is ticking
-	 * false | game is not ticking
-	 */
+	static uint16_t ticks;
+	ticks++;
+
+	//if (ticks >= (64 * 60)) // once per minute
+	if (ticks >= (64 * 8))
+	{
+		SendCrashReport();
+		ticks = 0;
+	}
 }
 
 // Potentially might not work
